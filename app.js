@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path')
 const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
 const {mongoURI} = require('./config/keys.js');
 
 const users = require('./routes/api/users.js');
@@ -12,8 +13,11 @@ const port = process.env.PORT || 3000;
 mongoose.connect(mongoURI)
   .then(() => console.log("MongoDB connected"))
   .catch((e) => console.log(`Their was a error ${e}`));
+
 app.set('view engine', 'ejs');
 app.use(express.static(path.resolve(__dirname, 'public')));
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());
 
 app.get('/', (req, res) => res.send("hello World wow wtf are u working"));
 app.use('/api/users', users);
