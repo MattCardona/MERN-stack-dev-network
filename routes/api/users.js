@@ -24,7 +24,8 @@ router.post('/register', (req, res) => {
           r: "pg", //rating
           d: "retro" //default
         });
-        const newUser = new User({name, email, avatar, password})
+        const newUser = new User({name, email, avatar, password});
+
         bcrypt.genSalt(10, (err, salt) => {
           bcrypt.hash(newUser.password, salt, (err, hash) => {
             if(err) throw err;
@@ -35,6 +36,31 @@ router.post('/register', (req, res) => {
           });
         });
       }
+    });
+});
+
+// @route GET api/users/login
+// @desc login User and return JWT token back
+// @access  Public
+router.post('/login', (req, res) => {
+  const { email, password } = req.body;
+  //first find user by email
+  User.findOne({email})
+    .then(user => {
+      //check for a user
+      if(!user){
+        return res.status(404).json({ email: "User not found"});
+      }
+      //check the users password
+      bcrypt.compare(password, user.password)
+        .then(isMatch => {
+          if(isMatch){
+            res.json({msg: "Success"});
+          }else{
+            return res.status(400).json({password: "Password was incorrect"});
+          }
+        })
+
     });
 });
 
