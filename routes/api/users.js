@@ -3,7 +3,9 @@ const router = express.Router();
 const gravatar = require('gravatar');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { secrete } = require('../../config/keys.js');
+const passport = require('passport');
+
+const { secret } = require('../../config/keys.js');
 const { User } = require('../../models/Users.js');
 
 // @route GET api/users/test
@@ -28,6 +30,7 @@ router.post('/register', (req, res) => {
         });
         const newUser = new User({name, email, avatar, password});
 
+        //SALT & HASH users password before saving the user to the database
         bcrypt.genSalt(10, (err, salt) => {
           bcrypt.hash(newUser.password, salt, (err, hash) => {
             if(err) throw err;
@@ -61,8 +64,8 @@ router.post('/login', (req, res) => {
             //User matched
             const {id, name, avatar} = user;
             const payload = { id, name, avatar};
-            //sign the token
-            jwt.sign(payload, secrete, { expiresIn: 3600}, (err, token) => {
+            //sign the token aka create the token and send it to the user
+            jwt.sign(payload, secret, { expiresIn: 3600}, (err, token) => {
                 res.json({
                   success: true,
                   token: "Bearer " + token
@@ -77,5 +80,11 @@ router.post('/login', (req, res) => {
     });
 });
 
+// @route GET api/users/current
+// @desc return current user
+// @access  Private
+router.get('/current', passport.authenticate('jwt', { session: false }), (req, res) => {
+  res.json(req.user);
+});
 
 module.exports = router;

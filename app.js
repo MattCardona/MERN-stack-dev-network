@@ -2,8 +2,9 @@ const express = require('express');
 const path = require('path')
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const {mongoURI} = require('./config/keys.js');
+const passport = require('passport');
 
+const {mongoURI} = require('./config/keys.js');
 const users = require('./routes/api/users.js');
 const profile = require('./routes/api/profile.js');
 const posts = require('./routes/api/posts.js');
@@ -19,7 +20,12 @@ app.use(express.static(path.resolve(__dirname, 'public')));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
-app.get('/', (req, res) => res.send("hello World wow wtf are u working"));
+// Passport middleware
+app.use(passport.initialize());
+// Passport Config
+require('./config/passport.js')(passport);
+
+// User routes
 app.use('/api/users', users);
 app.use('/api/profile', profile);
 app.use('/api/posts', posts);
