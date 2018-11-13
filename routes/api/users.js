@@ -7,7 +7,8 @@ const passport = require('passport');
 
 const { secret } = require('../../config/keys.js');
 const { User } = require('../../models/Users.js');
-
+const validateRegisterInput = require('../../validation/register.js');
+const validateLoginInput = require('../../validation/login.js');
 // @route GET api/users/test
 // @desc Test Users route
 // @access  Public
@@ -17,10 +18,18 @@ router.get('/test', (req, res) => res.json({msg: "Users works"}));
 // @desc register Users route
 // @access  Public
 router.post('/register', (req, res) => {
+  const {errors, isValid} = validateRegisterInput(req.body);
+
+  // check validation
+  if(!isValid){
+    return res.status(400).json(errors);
+  }
+
   User.findOne({ email: req.body.email })
     .then(user => {
       if(user){
-        return res.status(400).json({email: "Email already exists"});
+        errors.email = "Email already exists";
+        return res.status(400).json(errors);
       } else {
         const { name, email, password } = req.body;
         const avatar = gravatar.url(email, {
@@ -49,12 +58,20 @@ router.post('/register', (req, res) => {
 // @access  Public
 router.post('/login', (req, res) => {
   const { email, password } = req.body;
+  const {errors, isValid} = validateLoginInput(req.body);
+
+  // check validation
+  if(!isValid){
+    return res.status(400).json(errors);
+  }
+
   //first find user by email
   User.findOne({email})
     .then(user => {
       //check for a user
       if(!user){
-        return res.status(404).json({ email: "User not found"});
+        errors.email = "User not found";
+        return res.status(404).json(errors);
       }
       //check the users password
       bcrypt.compare(password, user.password)
@@ -73,7 +90,8 @@ router.post('/login', (req, res) => {
             });
 
           }else{
-            return res.status(400).json({password: "Password was incorrect"});
+            errors.password = "Password was incorrect";
+            return res.status(400).json(errors);
           }
         })
 
