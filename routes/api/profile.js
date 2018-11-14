@@ -29,4 +29,56 @@ router.get('/', passport.authenticate('jwt', { session: false }), (req, res) => 
     .catch(e => res.status(404).json(e));
 });
 
+// @route POST api/profile/
+// @desc Create or edit user profile
+// @access  Private
+router.post('/', passport.authenticate('jwt', { session: false }), (req, res) => {
+  const { handle, company, website, location, bio, status, githubusername, skills, youtube, twitter, linkedin, facebook, instagram } = req.body;
+  const profileFeilds = {};
+  const errors = {};
+  profileFeilds.user = req.user.id;
+  profileFeilds.social = {};
+  if(handle) profileFeilds.handle = handle;
+  if(company) profileFeilds.company = company;
+  if(website) profileFeilds.website = website;
+  if(location) profileFeilds.location = location;
+  if(bio) profileFeilds.bio = bio;
+  if(status) profileFeilds.status = status;
+  if(githubusername) profileFeilds.githubusername = githubusername;
+  // skills string need to make to array
+  if(typeof skills !== undefined){
+    profileFeilds.skills = skills.split(",");
+  }
+  // social
+  if(youtube) profileFeilds.social.youtube = youtube;
+  if(twitter) profileFeilds.social.twitter = twitter;
+  if(linkedin) profileFeilds.social.linkedin = linkedin;
+  if(facebook) profileFeilds.social.facebook = facebook;
+  if(instagram) profileFeilds.social.instagram = instagram;
+
+  Profile.findOne({user: req.user.id})
+    .then(profile => {
+      if(profile){
+        //update profile
+        Profile.findByIdAndUpdate({user: req.user.id}, {$set: profileFeilds}, {new: true})
+          .then(profile => res.json(profile))
+          .catch(err => console.log(`There was a error ${JSON.stringify(err, undefined, 2)}`));
+      }else{
+        //create profile
+        //first check if handle exists
+        Profile.findOne({handle: profileFeilds.handle})
+          .then(profile => {
+            errors.handle = "That handle already exists";
+            res.status(400).json(errors);
+          });
+        //Create a new profile
+        new Profile(profileFeilds).save()
+          .then(profile => {
+            res.json(profile);
+          })
+          .catch(err => console.log(`There was a error ${JSON.stringify(err, undefined, 2)}`));
+      }
+    })
+});
+
 module.exports = router;
