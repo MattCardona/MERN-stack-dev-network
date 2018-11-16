@@ -7,7 +7,7 @@ const validateProfileInput = require('../../validation/profile.js');
 const validateExperienceInput = require('../../validation/experience.js');
 const validateEducationInput = require('../../validation/education.js');
 const { Profile } = require('../../models/Profile.js');
-const { Users } = require('../../models/Users.js');
+const { User } = require('../../models/Users.js');
 
 
 // @route GET api/profile/test
@@ -196,7 +196,6 @@ router.post('/education', passport.authenticate('jwt', {session: false}), (req, 
 
   Profile.findOne({user: req.user.id})
     .then(profile => {
-        console.log("at least in here");
       const {school, degree, fieldofstudy, to, current, description} = req.body;
       const newEducation = {
         school,
@@ -212,6 +211,65 @@ router.post('/education', passport.authenticate('jwt', {session: false}), (req, 
       profile.save()
         .then(profile => res.json(profile))
         .catch(err => console.log(`There was a error ${JSON.stringify(err, undefined, 2)}`));
+    })
+    .catch(err => console.log(`There was a error ${JSON.stringify(err, undefined, 2)}`));
+});
+
+// @route DELETE api/profile/experience/:exp_id
+// @desc delete experience from profile
+// @access  Private
+router.delete('/experience/:exp_id', passport.authenticate('jwt', {session: false}), (req, res) => {
+  Profile.findOne({user: req.user.id})
+    .then(profile => {
+      //Create new experience array
+      const newExperienceArr = profile.experience.filter(exp => {
+        return exp.id !== req.params.exp_id;
+      });
+      if(newExperienceArr.length !== profile.experience.length){
+        profile.experience = newExperienceArr;
+        profile.save()
+          .then(profile => res.json(profile))
+          .catch(err => console.log(`There was a error ${JSON.stringify(err, undefined, 2)}`));
+      }
+    })
+    .catch(err => console.log(`There was a error ${JSON.stringify(err, undefined, 2)}`));
+});
+
+
+// @route DELETE api/profile/education/:edu_id
+// @desc delete education from profile
+// @access  Private
+router.delete('/education/:edu_id', passport.authenticate('jwt', {session: false}), (req, res) => {
+  Profile.findOne({user: req.user.id})
+    .then(profile => {
+      //Create new education array
+      const newEducationArr = profile.education.filter(edu => {
+        return edu.id !== req.params.edu_id;
+      });
+      if(newEducationArr.length !== profile.education.length){
+        profile.education = newEducationArr;
+        profile.save()
+          .then(profile => res.json(profile))
+          .catch(err => console.log(`There was a error ${JSON.stringify(err, undefined, 2)}`));
+      }else{
+        res.status(404).json({"msg": "Something went wrong"});
+      }
+    })
+    .catch(err => console.log(`There was a error ${JSON.stringify(err, undefined, 2)}`));
+});
+
+
+// @route DELETE api/profile/
+// @desc delete profile and user
+// @access  Private
+
+router.delete('/', passport.authenticate('jwt', {session: false}), (req, res) => {
+  Profile.findOneAndRemove({user: req.user.id})
+    .then(() => {
+      User.findByIdAndDelete(req.user.id)
+        .then(() => res.json({success: true}))
+            .catch(err => console.log(`There was a error ${JSON.stringify(err, undefined, 2)}`));
+
     })
     .catch(err => console.log(`There was a error ${JSON.stringify(err, undefined, 2)}`));
 });
