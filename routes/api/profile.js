@@ -4,6 +4,8 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 
 const validateProfileInput = require('../../validation/profile.js');
+const validateExperienceInput = require('../../validation/experience.js');
+const validateEducationInput = require('../../validation/education.js');
 const { Profile } = require('../../models/Profile.js');
 const { Users } = require('../../models/Users.js');
 
@@ -63,7 +65,7 @@ router.get('/handle/:handle', (req, res) => {
     .then(profile => {
       if(!profile){
         errors.noprofile = "Their is no profile for this user";
-        res.status(404).json(errors);
+        return res.status(404).json(errors);
       }
       res.json(profile);
     })
@@ -82,7 +84,7 @@ router.get('/user/:user_id', (req, res) => {
     .then(profile => {
       if(!profile){
         errors.noprofile = "Their is no profile for this user";
-        res.status(404).json(errors);
+        return res.status(404).json(errors);
       }
       res.json(profile);
     })
@@ -149,5 +151,69 @@ router.post('/', passport.authenticate('jwt', { session: false }), (req, res) =>
     .catch(err => console.log(`There was a error ${JSON.stringify(err, undefined, 2)}`));
 });
 
+
+// @route POST api/profile/experience
+// @desc add experience to profile
+// @access  Private
+router.post('/experience', passport.authenticate('jwt', {session: false}), (req, res) => {
+  const {errors, isValid} = validateExperienceInput(req.body);
+
+  if(!isValid){
+    return res.status(400).json(errors);
+  }
+
+  Profile.findOne({user: req.user.id})
+    .then(profile => {
+        console.log("at least in here");
+      const {title, company, location, to, current, description} = req.body;
+      const newExperience = {
+        title,
+        company,
+        location,
+        to,
+        from: req.body.from,
+        current,
+        description
+      };
+      //add to the experience array
+      profile.experience.unshift(newExperience);
+      profile.save()
+        .then(profile => res.json(profile))
+        .catch(err => console.log(`There was a error ${JSON.stringify(err, undefined, 2)}`));
+    })
+    .catch(err => console.log(`There was a error ${JSON.stringify(err, undefined, 2)}`));
+});
+
+// @route POST api/profile/education
+// @desc add education to profile
+// @access  Private
+router.post('/education', passport.authenticate('jwt', {session: false}), (req, res) => {
+  const {errors, isValid} = validateEducationInput(req.body);
+
+  if(!isValid){
+    return res.status(400).json(errors);
+  }
+
+  Profile.findOne({user: req.user.id})
+    .then(profile => {
+        console.log("at least in here");
+      const {school, degree, fieldofstudy, to, current, description} = req.body;
+      const newEducation = {
+        school,
+        degree,
+        fieldofstudy,
+        to,
+        from: req.body.from,
+        current,
+        description
+      };
+      //add to the experience array
+      profile.education.unshift(newEducation);
+      profile.save()
+        .then(profile => res.json(profile))
+        .catch(err => console.log(`There was a error ${JSON.stringify(err, undefined, 2)}`));
+    })
+    .catch(err => console.log(`There was a error ${JSON.stringify(err, undefined, 2)}`));
+});
 
 module.exports = router;
