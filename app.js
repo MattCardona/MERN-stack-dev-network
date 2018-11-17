@@ -10,7 +10,7 @@ const profile = require('./routes/api/profile.js');
 const posts = require('./routes/api/posts.js');
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5000;
 mongoose.connect(mongoURI)
   .then(() => console.log("MongoDB connected"))
   .catch((e) => console.log(`Their was a error ${e}`));
