@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios';
 
 class Register extends React.Component {
   constructor(props){
@@ -28,7 +29,9 @@ class Register extends React.Component {
       password,
       password2
     };
-    console.log(`This is the new user ${JSON.stringify(newUser, undefined, 2)}`);
+    axios.post('/api/users/register', newUser)
+      .then(res => console.log(res.data))
+      .catch(e => console.log(e.response.data));
   }
   render() {
     return (
