@@ -136,8 +136,11 @@ router.post('/', passport.authenticate('jwt', { session: false }), (req, res) =>
         //first check if handle exists
         Profile.findOne({handle: profileFeilds.handle})
           .then(profile => {
+            if(!profile){
+              return;
+            }
             errors.handle = "That handle already exists";
-            res.status(400).json(errors);
+            return res.status(400).json(errors);
           })
           .catch(err => console.log(`There was a error ${JSON.stringify(err, undefined, 2)}`));
         //Create a new profile
