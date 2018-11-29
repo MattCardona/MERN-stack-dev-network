@@ -1,49 +1,50 @@
 import React from 'react';
-import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import Spinner from '../common/Spinner.js';
-import { getProfiles } from '../../actions/profileActions.js';
+import { Link } from 'react-router-dom';
+import isEmpty from '../../validation/is-empty.js';
 
-class Profiles extends React.Component {
-  componentDidMount() {
-    this.props.getProfiles();
-  }
+class ProfileItem extends React.Component {
   render() {
-    const { profile, loading } = this.props.profile;
-    let profileItems;
-
-    if(profiles === null || loading){
-      profileItems = <Spinner />;
-    }else{
-      if(profiles.length > 0){
-        profileItems = <h1>Profiles will be here</h1>;
-      }else{
-        profileItems = <h4>No profiles found...</h4>;
-      }
-    }
+    const { profile } = this.props;
     return (
-      <div className="profiles">
-        <div className="container">
-          <div className="row">
-            <div className="col-md-12">
-              <h1 className="display-4 text-center">Developer Porfiles</h1>
-              <p className="lead text-center">Browse and connect with developers</p>
-              {profileItems}
+      <div className="card card-body bg-light mb-3">
+        <div className="row">
+          <div className="col-2">
+            <img src={profile.user.avatar} alt="users avatar" className="rounded-circle"/>
+          </div>
+            <div className="col-lg-6 col-md-4 col-8">
+              <h3>{profile.user.name}</h3>
+              <p>
+                {profile.user.status}{isEmpty(profile.company) ? null : <span>at {profile.company}</span>}
+              </p>
+              <p>
+                {isEmpty(profile.location) ? null : <span>{profile.location}</span>}
+              </p>
+              <Link to={`/profile/${profile.handle}`} className="btn btn-info">
+                View Profile
+              </Link>
+            </div>
+            <div className="col-md-4 d-none d-md-block">
+              <h4>Skill Set</h4>
+              <ul className="list-group">
+                {profile.skills.slice(0, 4).map((skill, index) => (
+                  <li key={index} className="list-group-item">
+                    <i className="fa fa-check pr-1" />
+                    {skill}
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </div>
-      </div>
     )
   }
 };
 
-Profiles.propTypes = {
-  getProfiles: PropTypes.func.isRequired,
+ProfileItem.propTypes = {
   profile: PropTypes.object.isRequired
 }
 
-const mapStateToProps = state => ({
-  profile: state.profile
-});
 
-export default connect(mapStateToProps, { getProfiles })(Profiles);
+
+export default ProfileItem;
