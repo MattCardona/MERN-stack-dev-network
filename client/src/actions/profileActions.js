@@ -1,10 +1,29 @@
 import axios from 'axios';
 import { GET_PROFILE, GET_PROFILES, PROFILE_LOADING, CLEAR_CURRENT_PROFILE, GET_ERRORS} from './types.js';
 import { logoutUser } from './authActions.js';
+
 // get current user profile
 export const getCurrentProfile = () => dispatch => {
   dispatch(setProfileLoading());
   axios.get('/api/profile')
+    .then(res =>
+      dispatch({
+        type: GET_PROFILE,
+        payload: res.data
+      })
+    )
+    .catch(e =>
+      dispatch({
+        type: GET_PROFILE,
+        payload: {}
+      })
+    )
+}
+
+// get profile with the handle
+export const getProfileByHandle = (handle) => dispatch => {
+  dispatch(setProfileLoading());
+  axios.get(`/api/profile/handle/${handle}`)
     .then(res =>
       dispatch({
         type: GET_PROFILE,
