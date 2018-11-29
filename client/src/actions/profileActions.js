@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { GET_PROFILE, PROFILE_LOADING, CLEAR_CURRENT_PROFILE, GET_ERRORS} from './types.js';
+import { GET_PROFILE, GET_PROFILES, PROFILE_LOADING, CLEAR_CURRENT_PROFILE, GET_ERRORS} from './types.js';
 import { logoutUser } from './authActions.js';
 // get current user profile
 export const getCurrentProfile = () => dispatch => {
@@ -102,6 +102,25 @@ export const deleteEducation = (eduId) => dispatch => {
       })
     )
 }
+
+// get all profiles
+export const getProfiles = () => dispatch => {
+  dispatch(setProfileLoading());
+  axios.get('/api/profile/all')
+    .then(res =>
+      dispatch({
+        type: GET_PROFILES,
+        payload: res.data
+      })
+    )
+    .catch(e =>
+      dispatch({
+        type: GET_PROFILES,
+        payload: null
+      })
+    )
+}
+
 
 // delete account and the profile
 export const deleteAccount = () => dispatch => {
