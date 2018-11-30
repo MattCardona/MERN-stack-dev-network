@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const passport = require('passport');
+const prependHttp = require('prepend-http');
 
 const validateProfileInput = require('../../validation/profile.js');
 const validateExperienceInput = require('../../validation/experience.js');
@@ -118,11 +119,11 @@ router.post('/', passport.authenticate('jwt', { session: false }), (req, res) =>
     profileFeilds.skills = skills.split(",");
   }
   // social
-  if(youtube) profileFeilds.social.youtube = youtube;
-  if(twitter) profileFeilds.social.twitter = twitter;
-  if(linkedin) profileFeilds.social.linkedin = linkedin;
-  if(facebook) profileFeilds.social.facebook = facebook;
-  if(instagram) profileFeilds.social.instagram = instagram;
+  if(youtube) profileFeilds.social.youtube = prependHttp(youtube, {https: true});
+  if(twitter) profileFeilds.social.twitter = prependHttp(twitter, {https: true});
+  if(linkedin) profileFeilds.social.linkedin = prependHttp(linkedin, {https: true});
+  if(facebook) profileFeilds.social.facebook = prependHttp(facebook, {https: true});
+  if(instagram) profileFeilds.social.instagram = prependHttp(instagram, {https: true});
 
   Profile.findOne({user: req.user.id})
     .then(profile => {
