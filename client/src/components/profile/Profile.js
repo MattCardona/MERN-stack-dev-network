@@ -35,9 +35,9 @@ class Profile extends React.Component {
             <div className="col-md-6">
             </div>
           </div>
-          <ProfileHeader profile={profile}/>
-          <ProfileAbout />
-          <ProfileCreds />
+          <ProfileHeader profile={profile} />
+          <ProfileAbout profile={profile} />
+          <ProfileCreds education={profile.education} experience={profile.experience}/>
           <ProfileGithub />
         </div>
       );
