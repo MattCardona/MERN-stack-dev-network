@@ -3,12 +3,14 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const passport = require('passport');
 const prependHttp = require('prepend-http');
+const axios = require('axios');
 
 const validateProfileInput = require('../../validation/profile.js');
 const validateExperienceInput = require('../../validation/experience.js');
 const validateEducationInput = require('../../validation/education.js');
 const { Profile } = require('../../models/Profile.js');
 const { User } = require('../../models/Users.js');
+const { clientId, clientSecret } = require('../../config/keys.js');
 
 
 // @route GET api/profile/test
@@ -50,6 +52,21 @@ router.get("/all", (req, res) => {
       res.json(profiles);
     })
     .catch(e => res.status(404).json({profile: "Their are no profiles"}));
+});
+
+// @route GET api/profile/github/:username/:count
+// @desc get a users gihub repos
+// @access  Public
+router.get("/github/:username/:count", (req, res) => {
+  const { username, count, sort } = req.params;
+  axios.get (`https://api.github.com/users/${username}/repos?per_page=${count}&sort=created: asc&client_id=${clientId}&client_secret=${clientSecret}`)
+  .then(data => {
+    return data.data;
+  })
+  .then(data => {
+    res.json(data);
+  })
+  .catch(e => res.status(404).json({error: "Something went wrong"}));
 });
 
 
