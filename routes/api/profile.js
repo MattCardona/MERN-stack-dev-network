@@ -58,7 +58,7 @@ router.get("/all", (req, res) => {
 // @desc get a users gihub repos
 // @access  Public
 router.get("/github/:username/:count", (req, res) => {
-  const { username, count, sort } = req.params;
+  const { username, count } = req.params;
   axios.get (`https://api.github.com/users/${username}/repos?per_page=${count}&sort=created: asc&client_id=${clientId}&client_secret=${clientSecret}`)
   .then(data => {
     return data.data;

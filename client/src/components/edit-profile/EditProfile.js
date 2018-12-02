@@ -35,12 +35,12 @@ class EditProfile extends React.Component {
   componentDidMount() {
     this.props.getCurrentProfile();
   }
-  componentWillReceiveProps(nextProps) {
-    if(nextProps.errors){
-      this.setState({errors: nextProps.errors})
+  componentDidUpdate(prevProps) {
+    if(prevProps.errors !== this.props.errors){
+      this.setState({errors: this.props.errors})
     }
-    if(nextProps.profile.profile){
-      const profile = nextProps.profile.profile;
+    if(this.props.profile.profile){
+      const profile = this.props.profile.profile;
       const {company, website, location, githubusername, bio, social} = profile;
       // bring skills back to comma seperated values
       const skillsCSV = profile.skills.join(',');
@@ -56,12 +56,14 @@ class EditProfile extends React.Component {
       profile.linkedin = !isEmpty(profile.social.linkedin) ? profile.social.linkedin : '';
       profile.youtube = !isEmpty(profile.social.youtube) ? profile.social.youtube : '';
       profile.instagram = !isEmpty(profile.social.instagram) ? profile.social.instagram : '';
-      // set the component field states
-      this.setState(prevState => ({
-        ...prevState,
-        ...profile,
-        skills: skillsCSV
-      }));
+      if(prevProps.profile !== this.props.profile){
+         // set the component field states
+        this.setState(prevState => ({
+          ...prevState,
+          ...profile,
+          skills: skillsCSV
+        }));
+      }
     }
   }
   onSubmit(e) {
