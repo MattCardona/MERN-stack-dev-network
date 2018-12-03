@@ -3,11 +3,14 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
 import { Link } from 'react-router-dom';
-import { deletePost } from '../../actions/postActions.js';
+import { deletePost, addLike } from '../../actions/postActions.js';
 
 class PostItem extends React.Component {
   onDeleteClick(id) {
     this.props.deletePost(id);
+  }
+  onLikeClick(id){
+    this.props.addLike(id);
   }
   render(){
     const { post, auth } = this.props;
@@ -24,7 +27,7 @@ class PostItem extends React.Component {
           </div>
           <div className="col-md-10">
             <p className="lead">{post.text}</p>
-            <button type="button" className="btn btn-light mr-1">
+            <button type="button" className="btn btn-light mr-1" onClick={this.onLikeClick.bind(this, post._id)}>
               <i className="text-info fas fa-thumbs-up"></i>
               <span className="badge badge-light">{post.likes.length}</span>
             </button>
@@ -45,11 +48,12 @@ class PostItem extends React.Component {
 PostItem.propTypes = {
   post: PropTypes.object.isRequired,
   auth: PropTypes.object.isRequired,
-  deletePost: PropTypes.func.isRequired
+  deletePost: PropTypes.func.isRequired,
+  addLike: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => ({
   auth: state.auth
 });
 
-export default connect(mapStateToProps, { deletePost })(PostItem);
+export default connect(mapStateToProps, { deletePost, addLike })(PostItem);
