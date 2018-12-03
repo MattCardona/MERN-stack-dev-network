@@ -15,6 +15,14 @@ class PostItem extends React.Component {
   onUnLikeClick(id){
     this.props.removeLike(id);
   }
+  findUserLike(likes) {
+    const { auth } = this.props;
+    if(likes.filter(like => like.user === auth.user.id).length > 0){
+      return true;
+    }else{
+      return false;
+    }
+  }
   render(){
     const { post, auth } = this.props;
     return (
@@ -31,7 +39,7 @@ class PostItem extends React.Component {
           <div className="col-md-10">
             <p className="lead">{post.text}</p>
             <button type="button" className="btn btn-light mr-1" onClick={this.onLikeClick.bind(this, post._id)}>
-              <i className="text-info fas fa-thumbs-up"></i>
+              <i className={classnames('fas fa-thumbs-up', {'text-info': this.findUserLike(post.likes)})}></i>
               <span className="badge badge-light">{post.likes.length}</span>
             </button>
             <button type="button" className="btn btn-light mr-1" onClick={this.onUnLikeClick.bind(this, post._id)}>
