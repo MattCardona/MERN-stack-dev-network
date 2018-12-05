@@ -13,7 +13,7 @@ class ProfileGithub extends React.Component {
     const { username } = this.props;
     const { count } = this.state;
 
-    fetch(`http://localhost:3000/api/profile/github/${username}/${count}`)
+    fetch(`/api/profile/github/${username}/${count}`)
       .then(res => res.json())
       .then(data => {
         // console.log(`This is the data ${JSON.stringify(data, undefined, 2)}`);
